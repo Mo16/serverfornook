@@ -32,7 +32,7 @@ app.post('/adduser', async (req, res) => {
     }
 
     try {
-        const newUser = new User({ username, address });
+        const newUser = new User({ username: username.toLowerCase(), address });
         await newUser.save();
         res.status(201).send('User added successfully');
     } catch (error) {
