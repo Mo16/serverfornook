@@ -32,9 +32,18 @@ app.post('/adduser', async (req, res) => {
     }
 
     try {
-        const newUser = new User({ username: username.toLowerCase(), address });
-        await newUser.save();
-        res.status(201).send('User added successfully');
+        // Check if the address already exists and update the username if it does
+        const updatedUser = await User.findOneAndUpdate(
+            { address }, // find a document with this address
+            { username: username.toLowerCase() }, // update the username
+            { new: true, upsert: true } // options: return the updated document and create it if it doesn't exist
+        );
+
+        if (updatedUser) {
+            res.status(201).send('User added or updated successfully');
+        } else {
+            res.status(404).send('User not found and not added');
+        }
     } catch (error) {
         res.status(500).send(error.message);
     }
